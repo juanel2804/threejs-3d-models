@@ -4,7 +4,7 @@
 		<title>three.js webgl - FBX loader</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<link type="text/css" rel="stylesheet" href="css/main.css">
+		<link type="text/css" rel="stylesheet" href="./css/main.css">
 	</head>
 
 	<body>
@@ -13,15 +13,16 @@
 			Character and animation from <a href="https://www.mixamo.com/" target="_blank" rel="noopener">Mixamo</a>
 		</div>
 
-		-- LIBRERÍAS desde CDN (NO modules) -->
-    <script src="https://unpkg.com/three@0.160.0/build/three.min.js"></script>
-    <script src="https://unpkg.com/three@0.160.0/examples/js/loaders/FBXLoader.js"></script>
-    <script src="https://unpkg.com/three@0.160.0/examples/js/controls/OrbitControls.js"></script>
-    <script src="https://unpkg.com/three@0.160.0/examples/js/libs/stats.min.js"></script>
-    <script src="https://unpkg.com/lil-gui@0.18.0/dist/lil-gui.min.js"></script>
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
 
-    <!-- Tu script sin módulos -->
-    <script src="./js/main.js"></script>
+		<script type="module" src="./js/main.js"></script>
 
 
 	</body>
