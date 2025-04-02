@@ -14,14 +14,11 @@ let mixer;
 
 const clock = new THREE.Clock();
 
+const animations = ['Samba Dancing', 'Walk', 'Run', 'Jump', 'Wave', 'Idle'];
+
 const params = {
     asset: 'Samba Dancing'
 };
-
-const assets = [
-    'Samba Dancing',
-    'morph_test'
-];
 
 
 init();
@@ -86,91 +83,45 @@ function init() {
     container.appendChild(stats.dom);
 
     const gui = new GUI();
-    gui.add(params, 'asset', assets).onChange(function (value) {
-
-        loadAsset(value);
-
+    gui.add(params, 'asset', animations).onChange(function (value) {
+        loadAnimation(value);
     });
+    
+    
 
     guiMorphsFolder = gui.addFolder('Morphs').hide();
 
 }
 
-function loadAsset(asset) {
-
-    loader.load('./models/fbx/' + asset + '.fbx', function (group) {
-
-        if (object) {
-
-            object.traverse(function (child) {
-
-                if (child.material) {
-
-                    const materials = Array.isArray(child.material) ? child.material : [child.material];
-                    materials.forEach(material => {
-
-                        if (material.map) material.map.dispose();
-                        material.dispose();
-
-                    });
-
-                }
-
-                if (child.geometry) child.geometry.dispose();
-
-            });
-
-            scene.remove(object);
-
-        }
-
-        //
+function loadAsset(assetName) {
+    loader.load('./models/fbx/' + assetName + '.fbx', function (group) {
 
         object = group;
-
-        if (object.animations && object.animations.length) {
-
-            mixer = new THREE.AnimationMixer(object);
-
-            const action = mixer.clipAction(object.animations[0]);
-            action.play();
-
-        } else {
-
-            mixer = null;
-
-        }
-
-        guiMorphsFolder.children.forEach((child) => child.destroy());
-        guiMorphsFolder.hide();
-
-        object.traverse(function (child) {
-
-            if (child.isMesh) {
-
-                child.castShadow = true;
-                child.receiveShadow = true;
-
-                if (child.morphTargetDictionary) {
-
-                    guiMorphsFolder.show();
-                    const meshFolder = guiMorphsFolder.addFolder(child.name || child.uuid);
-                    Object.keys(child.morphTargetDictionary).forEach((key) => {
-
-                        meshFolder.add(child.morphTargetInfluences, child.morphTargetDictionary[key], 0, 1, 0.01);
-
-                    });
-
-                }
-
-            }
-
-        });
-
         scene.add(object);
 
-    });
+        object.traverse(function (child) {
+            if (child.isMesh) {
+                child.castShadow = true;
+                child.receiveShadow = true;
+            }
+        });
 
+        // Cargar animación por defecto
+        loadAnimation(params.asset);
+    });
+}
+function loadAnimation(animName) {
+    loader.load('./models/fbx/' + animName + '.fbx', function (anim) {
+        if (!object) return;
+
+        if (mixer) mixer.stopAllAction();
+
+        mixer = new THREE.AnimationMixer(object);
+
+        const clip = anim.animations[0];
+        const action = mixer.clipAction(clip);
+        action.reset().fadeIn(0.5).play();
+    });
 }
 
 function onWindowResize() {
